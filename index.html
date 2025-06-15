@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Maize Production & Area Harvested in Africa</title>
+
+  <!-- OpenLayers UMD bundle -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@7.3.0/ol.css" />
+  <script src="https://cdn.jsdelivr.net/npm/ol@7.3.0/dist/ol.js"></script>
+
+  <!-- Fisher–Jenks classification -->
+  <script src="https://cdn.jsdelivr.net/npm/simple-statistics@7.8.3/dist/simple-statistics.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="legend.css" />
+</head>
+<body>
+
+  <!-- Title -->
+  <header>
+    <h2>CULTIVATION OF MAIZE CROPS IN AFRICA</h2>
+    <p>Take a journey through over 60 years of maize farming in Africa—from 1961 to 2023—and discover how patterns of food production have shifted across time and space. This tool helps you explore where maize is grown, how much is harvested, and how efficient production has been across the continent.
+
+      <p>👀 Start with Yield (kg/ha)
+Begin by visualizing maize yield, which measures how much maize is produced per hectare. While yield offers insights into productivity, it can sometimes be misleading—a country may have high yield due to small cultivated areas, or poor yield despite large-scale production. Keep that in mind as you explore.</p>
+<p>🧮 Next, explore the Dot Density Map
+For an even more detailed visual, use the dot density map. This view combines color (for production) with dot size (for area harvested), and uses more classes to reveal subtle differences between countries and years. It’s a powerful way to spot patterns, gaps, and standout performers over time.</p>
+  <p>🔘 Finally, try the Bivariate Map (Area × Production)
+Switch to the bivariate view to get a more balanced picture. This map combines area harvested and production using a 5×5 color matrix, helping you see both intensity and scale.
+Prefer to focus on one variable at a time? You can easily toggle to view either area or production independently for clearer insight.</p>
+  <p>⚠️ Disclaimer
+The data used in this application is sourced from the FAOSTAT database maintained by the Food and Agriculture Organization (FAO) of the United Nations. 
+Where national reporting was incomplete or inconsistent, missing values were regenerated using FAO’s ensemble imputation methodology, which combines 
+statistical models such as ARIMA, LOESS, and regression-based techniques to provide the most reasonable estimates across time and space.
+
+While this approach improves continuity and comparability of data across countries and years, users should be aware that imputed values are model-based estimates, 
+not direct observations. These values are best used for visualization, trend analysis, and broad policy insights—not for precise operational or commercial decision-making.
+    </p></p>   
+  </header>
+
+  <!-- Controls -->
+  <div class="control-panel">
+    <label><strong>Mode:</strong></label>
+    <select id="mapMode">
+      <option value="yield">Yield (Choropleth)</option>
+      <option value="dotdensity">Dot Density</option>
+      <option value="bivariate">Bivariate Blend</option>
+    </select>
+
+    <label><strong>Year A:</strong></label>
+    <input type="range" id="yearA" min="1961" max="2023" value="1994" />
+    <span id="yearLabelA">1994</span>
+
+    <label><strong>Year B:</strong></label>
+    <input type="range" id="yearB" min="1961" max="2023" value="2023" />
+    <span id="yearLabelB">2023</span>
+
+    <label><input type="checkbox" id="showArea" checked /> Show Area Harvested</label>
+    <label><input type="checkbox" id="showProd" checked /> Show Production</label>
+  </div>
+
+  <!-- Main Panel with Maps and Legend -->
+  <div id="mainPanel">
+    <div id="mapContainer">
+      <div id="mapA" class="map"></div>
+      <div id="mapB" class="map"></div>
+    </div>
+
+    <!-- Legend Panel -->
+    <div id="legendBox"></div>
+  </div>
+
+  <!-- Tooltip -->
+  <div id="tooltip"></div>
+
+  <!-- JS logic -->
+  <script src="legend.js"></script>
+  <script src="dual.js"></script>
+  <script>
+    function updateLegendBox() {
+      const mode = document.getElementById('mapMode').value;
+      const showArea = document.getElementById('showArea').checked;
+      const showProd = document.getElementById('showProd').checked;
+      if (mode === 'yield') {
+        renderYieldLegend('legendBox');
+      } else if (mode === 'bivariate') {
+        renderBivariateMatrix('legendBox', showProd, showArea);
+      } else {
+        document.getElementById('legendBox').innerHTML = '<strong>No legend available</strong>';
+      }
+    }
+
+    document.getElementById('mapMode').addEventListener('change', () => {
+      updateMaps();
+      updateLegendBox();
+    });
+    document.getElementById('showArea').addEventListener('change', () => {
+      updateMaps();
+      updateLegendBox();
+    });
+    document.getElementById('showProd').addEventListener('change', () => {
+      updateMaps();
+      updateLegendBox();
+    });
+    document.getElementById('yearA').addEventListener('input', updateLegendBox);
+    document.getElementById('yearB').addEventListener('input', updateLegendBox);
+
+    updateLegendBox();
+  </script>
+</body>
+</html>
